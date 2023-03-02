@@ -5,6 +5,8 @@ export function getCookie() {
       return { ...acc, [name]: value }
     }, {})
   }
+
+console.log (getCookie())
   
   export function deleteCookie(key) {
     document.cookie = `${key}=;expires=${new Date(0)}`
