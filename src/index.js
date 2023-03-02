@@ -7,6 +7,7 @@ import './utils.js';
 
 const cardsContainer = document.querySelector(".cards");
 const btnOpenFormAdd = document.querySelector("#add");
+const btnOpenFormAddLogin = document.querySelector("#login");
 const formCatAdd = document.querySelector("#popup-form-add");
 const formLogin = document.querySelector("#popup-form-login");
 const isAuth = Cookies.get("email");
@@ -57,7 +58,8 @@ function handleFormLogin(e) {
   const elementsFormLogin = [...formLogin.elements];
   const formData = serializeForm(elementsFormLogin);
   Cookies.set("email", formData.email, {expires: 5});
-  btnOpenPopupLogin.classList.remove('visually-hidden');
+  btnOpenFormAdd.classList.remove('visually-hidden');
+  btnOpenFormAddLogin.classList.add('visually-hidden');
   popupLogin.close()
 
 }
@@ -70,12 +72,21 @@ btnOpenFormAdd.addEventListener("click", (e) => {
   popupAdd.open();
 });
 
+btnOpenFormAddLogin.addEventListener("click", (e) => {
+  e.preventDefault();
+  popupLogin.open();
+});
+
 api.getAllCats()
   .then(dataCats => {
     dataCats.forEach((catData) => {
         const newElement = new Card(catData, "#card-template", handleClickCatImage);
         cardsContainer.prepend(newElement.getElement());
       });
+
+      localStorage.setItem('cats', JSON.stringify(dataCats))
+
+      console.log('localstorage', JSON.parse(localStorage.getItem('cats')));
   })    
   .catch(function(err){
     console.log(err);
@@ -85,11 +96,12 @@ api.getAllCats()
     popupLogin.open();
     btnOpenFormAdd.classList.add('visually-hidden');
   } else {
-    btnOpenPopupLogin.classList.add('visually-hidden');
+    btnOpenFormAddLogin.classList.add('visually-hidden');
   }
 
 popupAdd.setEventListener();
 popupImage.setEventListener();
 popupLogin.setEventListener();
 
+console.log(localStorage);
 
