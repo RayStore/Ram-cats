@@ -64,9 +64,6 @@ function handleFormLogin(e) {
 
 }
 
-formCatAdd.addEventListener("submit", handleFormAddCat);
-formLogin.addEventListener("submit", handleFormLogin);
-
 btnOpenFormAdd.addEventListener("click", (e) => {
   e.preventDefault();
   popupAdd.open();
@@ -77,31 +74,43 @@ btnOpenFormAddLogin.addEventListener("click", (e) => {
   popupLogin.open();
 });
 
-api.getAllCats()
-  .then(dataCats => {
-    dataCats.forEach((catData) => {
-        const newElement = new Card(catData, "#card-template", handleClickCatImage);
-        cardsContainer.prepend(newElement.getElement());
-      });
-
-      localStorage.setItem('cats', JSON.stringify(dataCats))
-
-      console.log('localstorage', JSON.parse(localStorage.getItem('cats')));
-  })    
-  .catch(function(err){
-    console.log(err);
-  })        
-
-  if(!isAuth) {
-    popupLogin.open();
-    btnOpenFormAdd.classList.add('visually-hidden');
+function checkLocalStorage() {
+  const localData = JSON.parse(localStorage.getItem('cats')); // нулевое значение, если нет данных
+  if(localData && localData.length) {
+    localData.forEach((catData) => {
+      const newElement = new Card(catData, "#card-template", handleClickCatImage);
+      cardsContainer.prepend(newElement.getElement());
+    });
   } else {
-    btnOpenFormAddLogin.classList.add('visually-hidden');
+    api.getAllCats()
+      .then(dataCats => {
+          dataCats.forEach((catData) => {
+            const newElement = new Card(catData, "#card-template", handleClickCatImage);
+            cardsContainer.prepend(newElement.getElement());
+          });
+
+          localStorage.setItem('cats', JSON.stringify(dataCats))
+
+      })
+      .catch(function(err){
+        console.log(err);
+      })
   }
+}
+
+formCatAdd.addEventListener("submit", handleFormAddCat);
+formLogin.addEventListener("submit", handleFormLogin);
+
+if(!isAuth) {
+  popupLogin.open();
+  btnOpenFormAdd.classList.add('visually-hidden');
+} else {
+  btnOpenFormAddLogin.classList.add('visually-hidden');
+}
 
 popupAdd.setEventListener();
 popupImage.setEventListener();
 popupLogin.setEventListener();
 
-console.log(localStorage);
+checkLocalStorage()
 
