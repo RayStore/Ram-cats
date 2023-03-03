@@ -3,14 +3,16 @@ export class Card {
     #selectorTemplate;
     #element;
     #handleCatTitle;
+    #handleClickCatImage;
     #getTemplate(){
         return document.querySelector(this.#selectorTemplate).content.querySelector('.card');
     }
 
-    constructor(data, selectorTemplate, handleCatTitle) {
+    constructor(data, selectorTemplate, handleCatTitle, handleClickCatImage) {
         this.#data = data;
         this.#selectorTemplate = selectorTemplate;
         this.#handleCatTitle = handleCatTitle;
+        this.#handleClickCatImage = handleClickCatImage;
     }
 
     getElement() {
@@ -31,6 +33,7 @@ export class Card {
 
     setEventListener() {
         this.cardTitleElement.addEventListener('click', this.#handleCatTitle)
+        this.cardImageElement.addEventListener('click', () => this.#handleClickCatImage(this.#data))
     }
 
 

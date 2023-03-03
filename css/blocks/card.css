@@ -52,7 +52,7 @@
     border: none;
     background-color: transparent;
     background-image: none;
-    color: #3e4243;
+    color: var(--text-seconadry-color);
     padding: 0;
     cursor: pointer;
     z-index: 2;
@@ -87,7 +87,7 @@
 
 .card:hover::before {
     backdrop-filter: blur(0);
-    background-color: transparent;
+    background-color: transparent; 
 }
 
 
