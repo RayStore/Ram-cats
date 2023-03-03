@@ -11,7 +11,8 @@ const btnOpenFormAddLogin = document.querySelector("#login");
 const formCatAdd = document.querySelector("#popup-form-add");
 const formLogin = document.querySelector("#popup-form-login");
 const isAuth = Cookies.get("email");
-console.log(isAuth); 
+const MAX_LIVE_STORAGE = 5;
+
 
 const popupAdd = new Popup("popup-add");
 const popupImage = new PopupWithImage("popup-cat-image");
@@ -33,14 +34,19 @@ function serializeForm(elements) {
   return formData;
 }
 
+function createCat(dataCat) {
+  const newElement = new Card(dataCat, "#card-template", handleClickCatImage);
+  cardsContainer.prepend(newElement.getElement());
+}
+
 function handleFormAddCat(e) {
   e.preventDefault();
   const elementsFormCat = [...formCatAdd.elements];
   const formData = serializeForm(elementsFormCat);
   api.addNewCat(formData)
     .then(function() {
-      const newElement = new Card(formData, "#card-template", handleClickCatImage);
-      cardsContainer.prepend(newElement.getElement());
+      createCat(formData);
+      updateLocalStorage(formData, {type: 'ADD_CAT'});
       popupAdd.close();
       })
       .catch(function(err){
@@ -74,22 +80,52 @@ btnOpenFormAddLogin.addEventListener("click", (e) => {
   popupLogin.open();
 });
 
+function setDataRefresh(minute, key) {
+  const setTime = new Date(new Date().getTime() + minute*60000);
+  localStorage.setItem(key, setTime);
+  return setTime;  
+}
+
+function updateLocalStorage(data, action) { // {type: 'ADD_CAT'} {type: 'ALL_CATS'} 
+  const oldStorage = JSON.parse(localStorage.getItem('cats'));
+
+  switch (action.type) {
+    case 'ADD_CAT': 
+      oldStorage.push(data);
+      localStorage.setItem('cats', JSON.stringify(oldStorage));  
+      return;
+    case 'ALL_CATS':
+      setDataRefresh(MAX_LIVE_STORAGE, 'catsRefresh');    
+      localStorage.setItem('cats', JSON.stringify(data));
+      return;
+    case 'DELETE_CAT': 
+      const newStorage = oldStorage.filter(cat => cat.id !== data.id)
+      localStorage.setItem('cats', JSON.stringify(newStorage));
+      return;
+    case 'EDIT_CAT':
+      const updateStorage = oldStorage.map(cat => cat.id !== data.id ? cat : data)
+      localStorage.setItem('cats', JSON.stringify(updateStorage));
+      return;
+    default:
+      break;
+  } 
+}
+
 function checkLocalStorage() {
   const localData = JSON.parse(localStorage.getItem('cats')); // нулевое значение, если нет данных
-  if(localData && localData.length) {
+  const getTimeExpires = localStorage.getItem('catsRefresh'); 
+  
+  if(localData && localData.length && new Date() < new Date(getTimeExpires)){
     localData.forEach((catData) => {
-      const newElement = new Card(catData, "#card-template", handleClickCatImage);
-      cardsContainer.prepend(newElement.getElement());
+      createCat(catData);
     });
   } else {
     api.getAllCats()
       .then(dataCats => {
           dataCats.forEach((catData) => {
-            const newElement = new Card(catData, "#card-template", handleClickCatImage);
-            cardsContainer.prepend(newElement.getElement());
-          });
-
-          localStorage.setItem('cats', JSON.stringify(dataCats))
+            createCat(catData);
+          }); 
+          updateLocalStorage(dataCats, {type: 'ALL_CATS'});
 
       })
       .catch(function(err){
