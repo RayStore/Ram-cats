@@ -44,13 +44,16 @@
 
 .cat-info__favourite {
     border: none;
-    border-color: transparent;
+    padding: 0;
+    border-color: inherit;
     color: var(--text-secondary-color);
     cursor: pointer;
+    border-radius: 10px;
 }
 
 .cat-info__favourite_active {
-    color: var(--tertiary-color)
+    color: red;
+    border: none;
 }
 
 .cat-info__name {

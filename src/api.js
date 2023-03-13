@@ -15,7 +15,7 @@
 // DELETE  https://cats.petiteweb.dev/api/single/:user/delete/:id - удалить котика из базы данных
 
 const config = {
-    baseUrl: "https://cats.petiteweb.dev/api/single/astronr",
+    baseUrl: "https://cats.petiteweb.dev/api/single/RayStore",
     headers: {
       "content-type": "application/json",
     },

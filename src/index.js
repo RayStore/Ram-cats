@@ -1,22 +1,33 @@
 import { api } from './api.js';
 import { Card } from './card.js';
 import { cats } from './cats.js';
-import { PopupWithImage } from './popup-image.js';
+import { PopupImage } from './popup-image.js';
 import { Popup } from './popup.js';
+import { CatsInfo } from './cats-info.js';
 import './utils.js';
 
 const cardsContainer = document.querySelector(".cards");
 const btnOpenFormAdd = document.querySelector("#add");
 const btnOpenFormAddLogin = document.querySelector("#login");
-const formCatAdd = document.querySelector("#popup-form-add");
+const formCatAdd = document.querySelector("#popup-form-add-cats");
 const formLogin = document.querySelector("#popup-form-login");
 const isAuth = Cookies.get("email");
 const MAX_LIVE_STORAGE = 5;
 
 
-const popupAdd = new Popup("popup-add");
-const popupImage = new PopupWithImage("popup-cat-image");
-const popupLogin = new Popup("popup-login")
+const popupAdd = new Popup("popup-add-cats");
+const popupLogin = new Popup("popup-login");
+const popupCatInfo = new Popup("popup-cat-info");
+const popupImage = new PopupImage("popup-image");
+const catsInfoInstance = new CatsInfo(
+  '#cats-info-template',
+  handleEditCatInfo,
+  handleLike,
+  handleCatDelete
+  )
+
+
+const catsInfoElement = catsInfoInstance.getElement();
 
 function serializeForm(elements) {
   const formData = {};
@@ -35,7 +46,7 @@ function serializeForm(elements) {
 }
 
 function createCat(dataCat) {
-  const newElement = new Card(dataCat, "#card-template", handleClickCatImage);
+  const newElement = new Card(dataCat, "#card-template", handleCatTitle, handleClickCatImage, handleLike);
   cardsContainer.prepend(newElement.getElement());
 }
 
@@ -55,8 +66,51 @@ function handleFormAddCat(e) {
 
 }  
     
-function handleClickCatImage(dataSrc) {
-  popupImage.open(dataSrc);
+function handleClickCatImage(dataCard) {
+  popupImage.open(dataCard);
+}
+
+function handleLike(data, cardInstance){
+  const {id, favorite} = data;
+  api.updateCatById(id, {favorite})
+    .then(() => {
+      if(cardInstance) {
+        cardInstance.setData(data);
+        cardInstance.updateView();
+      }
+      updateLocalStorage(data, {type: 'EDIT_CAT'});
+      console.log('лайк изменен');
+    })
+} 
+
+
+function handleCatDelete(cardInstance) {
+  api.deleteCatById(cardInstance.getId())
+    .then(() => {
+      cardInstance.deleteView();
+      
+      updateLocalStorage(cardInstance.getData(), {type: 'DELETE_CAT'}); 
+      popupCatInfo.close();
+    })
+}
+
+function handleEditCatInfo(cardInstance, data) {
+  const {age, description, name, id} = data;
+
+  api.updateCatById(id, {age, description, name})
+    .then(() => {
+      cardInstance.setData(data);
+      cardInstance.updateView();
+      
+      updateLocalStorage(data, {type: 'EDIT_CAT'}); 
+      popupCatInfo.close();
+    })
+}
+
+function handleCatTitle(cardInstance){
+  catsInfoInstance.setData(cardInstance); 
+  popupCatInfo.setContent(catsInfoElement); 
+  popupCatInfo.open();
 }
 
 function handleFormLogin(e) {
@@ -103,7 +157,7 @@ function updateLocalStorage(data, action) { // {type: 'ADD_CAT'} {type: 'ALL_CAT
       localStorage.setItem('cats', JSON.stringify(newStorage));
       return;
     case 'EDIT_CAT':
-      const updateStorage = oldStorage.map(cat => cat.id !== data.id ? cat : data)
+      const updateStorage = oldStorage.map(cat => cat.id === data.id ? data : cat); 
       localStorage.setItem('cats', JSON.stringify(updateStorage));
       return;
     default:
@@ -145,8 +199,11 @@ if(!isAuth) {
 }
 
 popupAdd.setEventListener();
-popupImage.setEventListener();
 popupLogin.setEventListener();
+popupCatInfo.setEventListener();
+popupImage.setEventListener();
+
+
 
 checkLocalStorage()
 

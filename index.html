@@ -38,11 +38,11 @@
             <img src="#" class="popup__image" alt="Изабражение">
         </div>
     </div>
-    <div class="popup popup-add">
+    <div class="popup popup-add-cats">
         <div class="popup__container" >
             <button class="popup__close btn"><i class="fa-solid fa-xmark"></i></button>
             <h2>Добавить питомца</h2>
-            <form class="form" id="popup-form-add">
+            <form class="form" id="popup-form-add-cats">
                 <div class="form__image"></div>
                 <input type="number" class="form__input" name="id" min="1" required placeholder="id">
                 <input type="number" class="form__input" name="age" placeholder="Возраст">
@@ -64,15 +64,13 @@
         <div class="popup__container">
         <button class="popup__close btn popup__close_external"><i class="fa-solid fa-xmark"></i></button>
         <div class="popup__content"></div>
-
         </div>
     </div>
 
     <div class="popup popup-image">
         <div class="popup__container">
-        <button class="popup__close btn popup__close_external"><i class="fa-solid fa-xmark"></i></button>
-        <img src="#" class="popup__image" alt="Изображение">
-
+            <button class="popup__close btn popup__close_external"><i class="fa-solid fa-xmark"></i></button>
+            <img src="#" class="popup__image" alt="Изабражение">
         </div>
     </div>
    
@@ -87,7 +85,7 @@
         </form>
         </div>
     </div>
-
+    
     <template id="card-template">
         <!-- <DOCUMENT_FRAGMENT> -->
         <div class="card">
@@ -107,7 +105,7 @@
             <span class="cat-info__id"></span>
             <div class="cat-info__title">
                 <h2 class="cat-info__name"></h2>
-                <button class="cat-info__favorite"><i class="fa-solid fa-heart fa-2x"></i></button>    
+                <button style="border: none" class="cat-info__favorite"> <i class="fa-solid fa-heart fa-2x"></i></button>    
             </div>
             <span class="cat-info__rate"></span>
             <div class="cat-info__age">

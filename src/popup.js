@@ -4,7 +4,14 @@ export class Popup {
     if (evt.key === "Escape") {
       this.close();
     }
-  };
+  }
+
+  setContent(contentNode) {
+    const containerContent = this._popupElement.querySelector('.popup__content');
+    containerContent.innerHTML = '';
+    containerContent.append(contentNode)
+  } 
+
   constructor(classPopup) {
     this._popupElement = document.querySelector(`.${classPopup}`);
   }
